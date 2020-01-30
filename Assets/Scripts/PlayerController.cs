@@ -1,17 +1,25 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 public class PlayerController : MonoBehaviour
 {
     private float speed = 150.0f;
     private float zBound = 6;
     private Rigidbody playerRb;
+    private int count;
+    public Text countText;
+    public Text gameoverText;
     
     // Start is called before the first frame update
     void Start()
     {
         playerRb = GetComponent<Rigidbody>(); 
+        count = 0;
+        SetCountText ();
+        gameoverText.text = "";
     }
 
     // Update is called once per frame
@@ -19,6 +27,7 @@ public class PlayerController : MonoBehaviour
     {
         MovePlayer();
         ConstrainPlayerPosition();
+    
     }
 
     // Moves the player based on arrow key input
@@ -50,7 +59,9 @@ public class PlayerController : MonoBehaviour
     {
         if(collision.gameObject.CompareTag("Enemy"))
         {
-            Debug.Log("Player has collided with enemy.");
+            Debug.Log("Player has collided with enemy, Game Over.. Restarting...");
+            GameoverText();
+            Invoke("GameoverDelay" , 4);
         }
     }
 
@@ -59,7 +70,23 @@ public class PlayerController : MonoBehaviour
         if(other.gameObject.CompareTag("Powerup"))
         {
             Destroy(other.gameObject);
+            count = count + 1;
+            SetCountText ();
         }
     }
+
+    void SetCountText ()
+    {
+        countText.text = "Score: " + count.ToString (); 
+    }
     
+    void GameoverText()
+    {
+        gameoverText.text = "Game Over";
+    }
+
+    void GameoverDelay()
+    {
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+    }
 }
